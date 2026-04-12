@@ -1,0 +1,55 @@
+:root {
+  --pc-primary: #4a97e2;
+  --pc-primary-light: #e6f3ff;
+  --pc-border: #d6e9ff;
+  --pc-text: #173f67;
+  --pc-shell-max: 1200px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--pc-primary-light);
+  color: var(--pc-text);
+}
+
+#app {
+  height: 100%;
+}
+
+.page-shell {
+  max-width: var(--pc-shell-max);
+  margin: 0 auto;
+  padding: 20px 5%;
+}
+
+@media (max-width: 960px) {
+  .page-shell {
+    padding: 16px;
+  }
+}
+
+.el-table {
+  margin-top: 16px;
+}
+
+.el-card {
+  margin-bottom: 16px;
+}
+
+.el-form-item {
+  margin-bottom: 16px;
+}
+
+.el-button + .el-button {
+  margin-left: 10px;
+}
