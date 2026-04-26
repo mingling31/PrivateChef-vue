@@ -103,10 +103,21 @@ const registerRules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
-function toDefaultPage(roles) {
-  if ((roles || []).includes('ROLE_ADMIN')) return '/admin'
-  if ((roles || []).includes('ROLE_CHEF')) return '/chefCenter'
+function getRoleHome(roles = []) {
+  if (roles.includes('ROLE_ADMIN')) return '/admin/users'
+  if (roles.includes('ROLE_CHEF')) return '/chefCenter/profile'
   return '/discover'
+}
+
+function canAccessPath(path, roles = []) {
+  if (!path) return false
+  if (path.startsWith('/admin')) return roles.includes('ROLE_ADMIN')
+  if (path.startsWith('/chefCenter')) return roles.includes('ROLE_CHEF')
+  if (path.startsWith('/userCenter')) return roles.includes('ROLE_USER')
+  if (path.startsWith('/order/create')) return roles.includes('ROLE_USER')
+  if (path.startsWith('/ai-dialogue')) return roles.includes('ROLE_USER')
+  if (path.startsWith('/discover')) return !(roles.includes('ROLE_CHEF') || roles.includes('ROLE_ADMIN'))
+  return true
 }
 
 async function handleLogin() {
@@ -122,7 +133,8 @@ async function handleLogin() {
     localStorage.setItem('principalType', principalType || (loginMode.value === 'chef' ? 'chef' : 'user'))
 
     const redirect = route.query.redirect ? decodeURIComponent(route.query.redirect) : ''
-    router.push(redirect || toDefaultPage(roles))
+    const target = redirect && canAccessPath(redirect, roles || []) ? redirect : getRoleHome(roles || [])
+    router.push(target)
     ElMessage.success(res.message || '登录成功')
   } catch (error) {
     ElMessage.error(error.response?.data?.message || '登录失败')

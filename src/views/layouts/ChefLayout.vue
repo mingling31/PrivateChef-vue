@@ -6,7 +6,7 @@
         <el-menu-item index="/chefCenter/profile">资料维护</el-menu-item>
         <el-menu-item index="/chefCenter/dishes">菜品管理</el-menu-item>
         <el-menu-item index="/chefCenter/packages">套餐管理</el-menu-item>
-        <el-menu-item index="/chefCenter/schedules">排班管理</el-menu-item>
+        <el-menu-item index="/chefCenter/schedules">时段设置</el-menu-item>
         <el-menu-item index="/chefCenter/orders">订单处理</el-menu-item>
       </el-menu>
     </aside>
@@ -14,8 +14,7 @@
       <header class="topbar">
         <div>{{ $route.meta.title }}</div>
         <div class="actions">
-          <el-button text @click="$router.push('/discover')">返回首页</el-button>
-          <el-button text @click="$router.push('/userCenter/orders')">我的订单</el-button>
+          <el-button text @click="$router.push('/chefCenter/orders')">订单处理</el-button>
           <el-button text type="danger" @click="logoutNow">退出登录</el-button>
         </div>
       </header>
@@ -72,6 +71,7 @@ function logoutNow() {
 .actions {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .content {

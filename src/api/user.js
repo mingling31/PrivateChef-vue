@@ -69,6 +69,21 @@ export function reviewUser(data) {
   })
 }
 
+export function updateUserStatus(userId, payload = {}) {
+  const rawStatus = payload.status
+  let status = rawStatus
+  if (rawStatus === 'active') status = '1'
+  if (rawStatus === 'disabled') status = '0'
+  return request({
+    url: '/api/users/review',
+    method: 'post',
+    data: {
+      userId,
+      status
+    }
+  })
+}
+
 export function uploadUserAvatar(file) {
   const formData = new FormData()
   formData.append('file', file)

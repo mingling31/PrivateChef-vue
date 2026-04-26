@@ -20,10 +20,9 @@
           <el-tag v-for="tag in detail.chef.cuisineTagDetails || []" :key="tag.tagId">{{ tag.tagName }}</el-tag>
         </div>
         <div class="actions">
-          <el-button type="primary" @click="goOrder">预约这位私厨</el-button>
-          <el-button v-if="canFavorite" :type="chefFavorited ? 'warning' : 'info'" plain class="btn-fav" @click="toggleChefFavorite">
-            <el-icon class="fav-icon"><StarFilled v-if="chefFavorited" /><Star v-else /></el-icon>
-            <span>{{ chefFavorited ? '已收藏' : '收藏私厨' }}</span>
+          <el-button v-if="canOrder" type="primary" @click="goOrder">预约这位私厨</el-button>
+          <el-button v-if="canFavorite" :type="chefFavorited ? 'warning' : 'info'" plain @click="toggleChefFavorite">
+            {{ chefFavorited ? '已收藏' : '收藏私厨' }}
           </el-button>
         </div>
       </el-card>
@@ -47,11 +46,9 @@
                 size="small"
                 :type="isPackageFavorited(row.packageId) ? 'warning' : 'info'"
                 plain
-                class="btn-fav"
                 @click="togglePackageFavorite(row.packageId)"
               >
-                <el-icon class="fav-icon"><StarFilled v-if="isPackageFavorited(row.packageId)" /><Star v-else /></el-icon>
-                <span>{{ isPackageFavorited(row.packageId) ? '已收藏' : '收藏' }}</span>
+                {{ isPackageFavorited(row.packageId) ? '已收藏' : '收藏' }}
               </el-button>
             </template>
           </el-table-column>
@@ -86,8 +83,9 @@ const detail = ref({})
 const loading = ref(false)
 const chefFavorited = ref(false)
 const packageFavoriteIds = ref(new Set())
-const canFavorite = JSON.parse(localStorage.getItem('userRoles') || '[]')
-  .some(role => ['ROLE_USER', 'ROLE_ADMIN'].includes(role))
+const roles = JSON.parse(localStorage.getItem('userRoles') || '[]')
+const canOrder = roles.includes('ROLE_USER')
+const canFavorite = roles.some(role => ['ROLE_USER', 'ROLE_ADMIN'].includes(role))
 
 function mealText(mealType) {
   return { 1: '早餐', 2: '午餐', 3: '晚餐', 4: '宵夜' }[mealType] || '未知'
@@ -134,7 +132,7 @@ async function loadFavoriteStatus() {
     const chefSet = new Set((chefRes.data || []).map(i => i.targetId))
     packageFavoriteIds.value = new Set((pkgRes.data || []).map(i => i.targetId))
     chefFavorited.value = chefSet.has(route.params.chefId)
-  } catch (e) {
+  } catch {
     chefFavorited.value = false
     packageFavoriteIds.value = new Set()
   }
@@ -238,16 +236,6 @@ onMounted(loadDetail)
 .actions {
   display: flex;
   gap: 10px;
-}
-
-.btn-fav {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.fav-icon {
-  font-size: 16px;
 }
 
 .dish-grid {

@@ -1,15 +1,17 @@
 <template>
   <header class="top-nav">
     <div class="inner">
-      <div class="left" @click="$router.push('/discover')">
+      <div class="left" @click="goBrandTarget">
         <div class="logo">食光私厨</div>
       </div>
       <div class="right">
-
-        <el-button text v-if="isLogin" @click="$router.push('/userCenter/profile')">个人中心</el-button>
-        <el-button text v-if="isLogin" @click="$router.push('/userCenter/orders')">我的订单</el-button>
         <template v-if="isLogin">
-          <el-avatar class="avatar" :src="avatarUrl" @click="$router.push('/userCenter/profile')">
+          <el-button v-if="isUser" text @click="$router.push('/userCenter/profile')">个人中心</el-button>
+          <el-button v-if="isUser" text @click="$router.push('/userCenter/orders')">我的订单</el-button>
+          <el-button v-if="isChef" text @click="$router.push('/chefCenter/profile')">私厨中心</el-button>
+          <el-button v-if="isAdmin" text @click="$router.push('/admin/users')">管理后台</el-button>
+
+          <el-avatar class="avatar" :src="avatarUrl" @click="goAvatarTarget">
             {{ avatarText }}
           </el-avatar>
           <el-button text type="danger" @click="logoutNow">退出登录</el-button>
@@ -25,14 +27,45 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { House } from '@element-plus/icons-vue'
 import { logout } from '@/utils/auth'
 
 const router = useRouter()
 const userInfo = computed(() => JSON.parse(localStorage.getItem('userInfo') || '{}'))
+const roles = computed(() => JSON.parse(localStorage.getItem('userRoles') || '[]'))
 const isLogin = computed(() => !!localStorage.getItem('jwtToken'))
+const isUser = computed(() => roles.value.includes('ROLE_USER'))
+const isChef = computed(() => roles.value.includes('ROLE_CHEF'))
+const isAdmin = computed(() => roles.value.includes('ROLE_ADMIN'))
 const avatarUrl = computed(() => userInfo.value.avatar || '')
 const avatarText = computed(() => (userInfo.value.nickname || userInfo.value.username || 'U').slice(0, 1))
+
+function goBrandTarget() {
+  if (!isLogin.value) {
+    router.push('/discover')
+    return
+  }
+  if (isAdmin.value) {
+    router.push('/admin/users')
+    return
+  }
+  if (isChef.value) {
+    router.push('/chefCenter/profile')
+    return
+  }
+  router.push('/discover')
+}
+
+function goAvatarTarget() {
+  if (isAdmin.value) {
+    router.push('/admin/users')
+    return
+  }
+  if (isChef.value) {
+    router.push('/chefCenter/profile')
+    return
+  }
+  router.push('/userCenter/profile')
+}
 
 function logoutNow() {
   logout()
