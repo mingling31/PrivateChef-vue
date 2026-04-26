@@ -21,8 +21,9 @@
         </div>
         <div class="actions">
           <el-button type="primary" @click="goOrder">预约这位私厨</el-button>
-          <el-button v-if="canFavorite" :type="chefFavorited ? 'warning' : 'info'" plain @click="toggleChefFavorite">
-            {{ chefFavorited ? '已收藏' : '收藏私厨' }}
+          <el-button v-if="canFavorite" :type="chefFavorited ? 'warning' : 'info'" plain class="btn-fav" @click="toggleChefFavorite">
+            <el-icon class="fav-icon"><StarFilled v-if="chefFavorited" /><Star v-else /></el-icon>
+            <span>{{ chefFavorited ? '已收藏' : '收藏私厨' }}</span>
           </el-button>
         </div>
       </el-card>
@@ -46,9 +47,11 @@
                 size="small"
                 :type="isPackageFavorited(row.packageId) ? 'warning' : 'info'"
                 plain
+                class="btn-fav"
                 @click="togglePackageFavorite(row.packageId)"
               >
-                {{ isPackageFavorited(row.packageId) ? '已收藏' : '收藏' }}
+                <el-icon class="fav-icon"><StarFilled v-if="isPackageFavorited(row.packageId)" /><Star v-else /></el-icon>
+                <span>{{ isPackageFavorited(row.packageId) ? '已收藏' : '收藏' }}</span>
               </el-button>
             </template>
           </el-table-column>
@@ -235,6 +238,16 @@ onMounted(loadDetail)
 .actions {
   display: flex;
   gap: 10px;
+}
+
+.btn-fav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fav-icon {
+  font-size: 16px;
 }
 
 .dish-grid {

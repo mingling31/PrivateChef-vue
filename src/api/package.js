@@ -30,3 +30,16 @@ export function deleteChefPackage(packageId) {
     method: 'delete'
   })
 }
+
+export function uploadPackageImage(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request({
+    url: '/api/files/upload/package',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}

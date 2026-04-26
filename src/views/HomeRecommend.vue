@@ -17,7 +17,7 @@
       </section>
 
       <el-card class="section">
-        <template #header>套餐筛选与横向对比</template>
+        <template #header>套餐筛选</template>
         <el-form :inline="true" :model="filterForm" class="filter-form">
           <el-form-item label="时段">
             <el-select v-model="filterForm.mealType" clearable placeholder="全部">
@@ -40,30 +40,11 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="runFilter">筛选</el-button>
-            <el-button @click="runCompare">横向对比</el-button>
+            <el-button @click="resetFilter">重置</el-button>
           </el-form-item>
         </el-form>
 
-        <el-table v-if="compareRows.length" :data="compareRows" border>
-          <el-table-column label="私厨">
-            <template #default="{ row }">
-              <div class="chef-cell">
-                <el-avatar :size="36" :src="row.chefAvatar" />
-                <span>{{ row.chefName }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="rating" label="评分" />
-          <el-table-column prop="serviceRadius" label="服务范围(km)" />
-          <el-table-column prop="packagePrice" label="套餐价格" />
-          <el-table-column prop="distanceKm" label="距离(km)" />
-          <el-table-column label="可预约时间">
-            <template #default="{ row }">
-              {{ (row.availableSlots || []).join(' / ') || '暂无' }}
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-table v-else-if="filterRows.length" :data="filterRows" border>
+        <el-table v-if="filterRows.length" :data="filterRows" border>
           <el-table-column label="私厨">
             <template #default="{ row }">{{ row.chef?.realName }}</template>
           </el-table-column>
@@ -90,9 +71,11 @@
                 v-if="canFavorite"
                 :type="isChefFavorited(chef.chefId) ? 'warning' : 'info'"
                 plain
+                class="btn-fav"
                 @click="toggleChefFavorite(chef.chefId)"
               >
-                {{ isChefFavorited(chef.chefId) ? '已收藏' : '收藏' }}
+                <el-icon class="fav-icon"><StarFilled v-if="isChefFavorited(chef.chefId)" /><Star v-else /></el-icon>
+                <span>{{ isChefFavorited(chef.chefId) ? '已收藏' : '收藏' }}</span>
               </el-button>
             </div>
           </div>
@@ -111,9 +94,11 @@
               v-if="canFavorite"
               :type="isPackageFavorited(pkg.packageId) ? 'warning' : 'info'"
               plain
+              class="btn-fav"
               @click.stop="togglePackageFavorite(pkg.packageId)"
             >
-              {{ isPackageFavorited(pkg.packageId) ? '已收藏' : '收藏套餐' }}
+              <el-icon class="fav-icon"><StarFilled v-if="isPackageFavorited(pkg.packageId)" /><Star v-else /></el-icon>
+              <span>{{ isPackageFavorited(pkg.packageId) ? '已收藏' : '收藏套餐' }}</span>
             </el-button>
           </div>
         </div>
@@ -141,13 +126,12 @@
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import TopNavBar from '@/components/TopNavBar.vue'
-import { comparePackages, filterPackages, getPublicHomeData } from '@/api/public'
+import { filterPackages, getPublicHomeData } from '@/api/public'
 import { getFavoriteList, toggleFavorite } from '@/api/favorite'
 
 const home = reactive({ chefs: [], packages: [], dishes: [] })
 const filterForm = reactive({ mealType: null, dishCount: null, packageName: '' })
 const filterRows = ref([])
-const compareRows = ref([])
 const favoriteChefIds = ref(new Set())
 const favoritePackageIds = ref(new Set())
 const canFavorite = JSON.parse(localStorage.getItem('userRoles') || '[]')
@@ -193,15 +177,14 @@ async function loadHome() {
 async function runFilter() {
   const res = await filterPackages({ ...filterForm })
   filterRows.value = res.data || []
-  compareRows.value = []
   if (!filterRows.value.length) ElMessage.info('没有匹配到套餐')
 }
 
-async function runCompare() {
-  const res = await comparePackages({ ...filterForm })
-  compareRows.value = res.data || []
+function resetFilter() {
+  filterForm.mealType = null
+  filterForm.dishCount = null
+  filterForm.packageName = ''
   filterRows.value = []
-  if (!compareRows.value.length) ElMessage.info('暂无可对比数据')
 }
 
 function isChefFavorited(chefId) {
@@ -332,10 +315,14 @@ onMounted(loadHome)
   width: 240px;
 }
 
-.chef-cell {
-  display: flex;
+.btn-fav {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+}
+
+.fav-icon {
+  font-size: 16px;
 }
 
 .grid {

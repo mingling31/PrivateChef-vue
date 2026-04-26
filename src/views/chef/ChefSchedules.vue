@@ -48,7 +48,7 @@
 
     <el-divider />
 
-    <el-table :data="schedules" border class="result-table">
+    <el-table :data="paginatedSchedules" border class="result-table">
       <el-table-column prop="workDate" label="日期" />
       <el-table-column label="早餐">
         <template #default="{ row }">{{ statusText(row.breakfastStatus) }}</template>
@@ -63,11 +63,23 @@
         <template #default="{ row }">{{ statusText(row.snackStatus) }}</template>
       </el-table-column>
     </el-table>
+
+    <div class="pagination-wrapper">
+      <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="schedules.length"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+      />
+    </div>
   </el-card>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getChefByUserId } from '@/api/chef'
 import { getChefSchedules, saveChefSchedule, saveChefScheduleBatch } from '@/api/schedule'
@@ -90,6 +102,17 @@ const batch = reactive({
   snackOn: false
 })
 
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+// 计算当前页显示的数据
+const paginatedSchedules = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return schedules.value.slice(start, end)
+})
+
 function statusText(status) {
   return { 0: '未开放', 1: '可预约', 2: '已约满' }[status] || '未知'
 }
@@ -100,6 +123,8 @@ async function loadData() {
   if (!chefId.value) return
   const res = await getChefSchedules({ chefId: chefId.value })
   schedules.value = res.data || []
+  // 重置到第一页
+  currentPage.value = 1
 }
 
 async function saveOne() {
@@ -138,6 +163,16 @@ async function saveBatch() {
   await loadData()
 }
 
+// 分页事件处理
+function handleSizeChange(val) {
+  pageSize.value = val
+  currentPage.value = 1
+}
+
+function handleCurrentChange(val) {
+  currentPage.value = val
+}
+
 onMounted(loadData)
 </script>
 
@@ -169,5 +204,11 @@ onMounted(loadData)
 
 .result-table {
   margin-top: 4px;
+}
+
+.pagination-wrapper {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

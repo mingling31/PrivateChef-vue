@@ -15,14 +15,6 @@ export function filterPackages(params) {
   })
 }
 
-export function comparePackages(params) {
-  return request({
-    url: '/api/public/packages/compare',
-    method: 'get',
-    params
-  })
-}
-
 export function getCuisineTags() {
   return request({
     url: '/api/public/cuisine-tags',
