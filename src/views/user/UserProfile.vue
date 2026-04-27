@@ -304,13 +304,13 @@ import { EMAIL_REGEX, PHONE_REGEX } from '@/utils/validators'
 // 导入中国省市区数据（需要安装 china-area-data 或使用静态JSON）
 import areas from 'china-area-data'
 
-const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+const storedUser = JSON.parse(localStorage.getItem('userInfo') || '{}')
 const form = reactive({
-  userName: '',
-  nickname: '',
-  phone: '',
-  email: '',
-  avatar: ''
+  userName: storedUser.username || storedUser.account || '',
+  nickname: storedUser.nickname || storedUser.username || '',
+  phone: storedUser.phone || '',
+  email: storedUser.email || '',
+  avatar: storedUser.avatar || ''
 })
 
 const profileRef = ref()
@@ -652,7 +652,7 @@ async function deleteAddress(id) {
       type: 'warning'
     })
 
-    // await deleteUserAddress(userInfo.id, id)
+    // await deleteUserAddress(storedUser.id, id)
     addresses.value = addresses.value.filter(addr => addr.id !== id)
     ElMessage.success('地址已删除')
   } catch (e) {
@@ -665,7 +665,7 @@ async function deleteAddress(id) {
 // 设置默认地址
 async function setDefaultAddress(id) {
   try {
-    // await setDefaultUserAddress(userInfo.id, id)
+    // await setDefaultUserAddress(storedUser.id, id)
     addresses.value.forEach(addr => {
       addr.isDefault = addr.id === id
     })
@@ -691,7 +691,7 @@ async function saveAddress() {
       id: addressForm.id || undefined
     }
 
-    // await saveUserAddress(userInfo.id, addressData)
+    // await saveUserAddress(storedUser.id, addressData)
 
     if (editingAddress.value) {
       const index = addresses.value.findIndex(a => a.id === addressData.id)
@@ -744,8 +744,8 @@ function resetAddressForm() {
 async function loadData() {
   try {
     const [userRes, addressRes] = await Promise.all([
-      getUserById(userInfo.id),
-      getUserAddresses(userInfo.id)
+      getUserById(storedUser.id),
+      getUserAddresses(storedUser.id)
     ])
 
     Object.assign(form, userRes.data || {})
@@ -756,34 +756,15 @@ async function loadData() {
       ...form
     }))
   } catch (e) {
-    // 使用模拟数据
-    form.userName = userInfo.userName || 'user123'
-    form.nickname = '用户昵称'
-    form.phone = '13800138000'
-    form.email = 'user@example.com'
+    console.error('加载用户数据失败，使用本地缓存数据:', e)
+    // 使用 localStorage 中的已有数据，避免显示假数据
+    form.userName = storedUser.username || storedUser.account || ''
+    form.nickname = storedUser.nickname || storedUser.username || ''
+    form.phone = storedUser.phone || ''
+    form.email = storedUser.email || ''
+    form.avatar = storedUser.avatar || ''
 
-    addresses.value = [
-      {
-        id: 1,
-        contactName: '张三',
-        contactPhone: '13800138000',
-        province: '北京市',
-        city: '北京市',
-        district: '朝阳区',
-        detailAddress: '建国门外大街1号',
-        isDefault: true
-      },
-      {
-        id: 2,
-        contactName: '李四',
-        contactPhone: '13900139000',
-        province: '上海市',
-        city: '上海市',
-        district: '浦东新区',
-        detailAddress: '陆家嘴环路1000号',
-        isDefault: false
-      }
-    ]
+    addresses.value = []
   }
 }
 

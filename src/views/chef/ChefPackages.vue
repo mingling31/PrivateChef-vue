@@ -69,7 +69,9 @@
         </el-form-item>
 
         <el-form-item label="价格" prop="price">
-          <el-input-number v-model="form.price" :min="0" :precision="2" :step="1" />
+          <el-input v-model="form.price" placeholder="请输入价格" type="number" :min="0" :step="0.01">
+            <template #append>元</template>
+          </el-input>
         </el-form-item>
 
         <el-form-item label="套餐图片" prop="packageImage">
@@ -107,8 +109,6 @@
             v-model="form.selectedDishIds"
             multiple
             filterable
-            collapse-tags
-            collapse-tags-tooltip
             placeholder="请选择菜品"
             style="width: 100%"
           >

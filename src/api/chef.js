@@ -46,9 +46,8 @@ export function uploadChefImage(file) {
 export function uploadChefCertImage(file) {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('type', 'cert')
   return request({
-    url: '/api/files/upload',
+    url: '/api/files/upload/chef-cert',
     method: 'post',
     data: formData,
     headers: {

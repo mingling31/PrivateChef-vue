@@ -77,11 +77,14 @@
             <el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
             <el-button size="small" type="primary" plain @click="openDetail(row)">详情</el-button>
             <el-button v-if="row.status === 'pending_accept'" size="small" type="success" @click="accept(row)">
               接单
+            </el-button>
+            <el-button v-if="row.status === 'pending_accept'" size="small" type="danger" plain @click="openRejectDialog(row)">
+              拒绝
             </el-button>
             <el-button v-if="row.status === 'serving'" size="small" type="warning" @click="complete(row)">
               完成
@@ -171,6 +174,26 @@
         <el-button @click="detailVisible = false">关闭</el-button>
       </template>
     </el-dialog>
+
+    <!-- 拒绝接单对话框 -->
+    <el-dialog v-model="rejectDialogVisible" title="拒绝接单" width="500px">
+      <div class="reject-info">
+        <p>订单号：<b>{{ currentRejectOrder.orderNo }}</b></p>
+        <p>服务时间：<b>{{ currentRejectOrder.serviceDate }} {{ mealLabel(currentRejectOrder.mealType) }}</b></p>
+      </div>
+      <el-input
+        v-model="rejectReason"
+        type="textarea"
+        :rows="4"
+        placeholder="请输入拒绝原因（必填）"
+        maxlength="200"
+        show-word-limit
+      />
+      <template #footer>
+        <el-button @click="rejectDialogVisible = false">取消</el-button>
+        <el-button type="danger" :loading="rejecting" @click="handleReject">确认拒绝</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -179,7 +202,7 @@ import { computed, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { getChefByUserId } from '@/api/chef'
-import { acceptOrder, completeOrder, getOrderDetail, getOrders } from '@/api/order'
+import { acceptOrder, completeOrder, getOrderDetail, getOrders, rejectOrder } from '@/api/order'
 
 const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
 
@@ -197,6 +220,11 @@ const chefId = ref('')
 
 const detailVisible = ref(false)
 const currentOrder = ref({})
+
+const rejectDialogVisible = ref(false)
+const currentRejectOrder = ref({})
+const rejectReason = ref('')
+const rejecting = ref(false)
 
 const stats = computed(() => {
   const s = { total: total.value, unpaid: 0, pending_accept: 0, serving: 0, completed: 0, cancelled: 0 }
@@ -325,6 +353,30 @@ async function complete(row) {
     await reload()
   } catch (e) {
     ElMessage.error('操作失败')
+  }
+}
+
+function openRejectDialog(row) {
+  currentRejectOrder.value = row
+  rejectReason.value = ''
+  rejectDialogVisible.value = true
+}
+
+async function handleReject() {
+  if (!rejectReason.value || rejectReason.value.trim() === '') {
+    ElMessage.warning('请输入拒绝原因')
+    return
+  }
+  try {
+    rejecting.value = true
+    await rejectOrder(currentRejectOrder.value.orderId, rejectReason.value)
+    ElMessage.success('已拒绝订单')
+    rejectDialogVisible.value = false
+    await reload()
+  } catch (e) {
+    ElMessage.error(e.message || '拒绝失败')
+  } finally {
+    rejecting.value = false
   }
 }
 
@@ -531,6 +583,23 @@ onMounted(async () => {
 .dish-item small {
   color: #94a3b8;
   font-size: 12px;
+}
+
+/* 拒绝接单对话框样式 */
+.reject-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f7fbff;
+  border-radius: 8px;
+}
+
+.reject-info p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.reject-info b {
+  color: #111827;
 }
 
 @media (max-width: 1200px) {

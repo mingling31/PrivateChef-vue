@@ -201,11 +201,13 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { cancelOrder, getOrderDetail, getOrders, payOrder, reviewOrder } from '@/api/order'
 
 const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+const router = useRouter()
 
 const loading = ref(false)
 const orders = ref([])
@@ -326,16 +328,7 @@ async function openDetail(row) {
 }
 
 async function pay(row) {
-  try {
-    await payOrder(row.orderId)
-    ElMessage.success('支付成功')
-    await reload()
-    if (detailVisible.value) {
-      detailVisible.value = false
-    }
-  } catch (e) {
-    ElMessage.error('支付失败')
-  }
+  router.push(`/payment/${row.orderId}`)
 }
 
 async function cancel(row) {
@@ -571,6 +564,16 @@ onMounted(reload)
 .dish-item small {
   color: #94a3b8;
   font-size: 12px;
+}
+
+/* 取消原因样式 */
+.cancel-reason {
+  color: #f56c6c;
+  font-size: 13px;
+}
+
+.no-reason {
+  color: #c0c4cc;
 }
 
 /* 评价弹窗评分数字样式 */

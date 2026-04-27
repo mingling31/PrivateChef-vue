@@ -29,6 +29,7 @@
           <el-checkbox value="1">早餐</el-checkbox>
           <el-checkbox value="2">午餐</el-checkbox>
           <el-checkbox value="3">晚餐</el-checkbox>
+          <el-checkbox value="4">宵夜</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
 

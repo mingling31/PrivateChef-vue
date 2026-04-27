@@ -60,6 +60,14 @@ export function completeOrder(orderId) {
   })
 }
 
+export function rejectOrder(orderId, rejectReason) {
+  return request({
+    url: `/api/orders/${orderId}/reject`,
+    method: 'post',
+    data: { rejectReason }
+  })
+}
+
 export function reviewOrder(orderId, data) {
   return request({
     url: `/api/orders/${orderId}/review`,

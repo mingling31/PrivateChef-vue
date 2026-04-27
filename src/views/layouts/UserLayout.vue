@@ -7,6 +7,7 @@
         <el-menu-item index="/userCenter/preferences">我的偏好</el-menu-item>
         <el-menu-item index="/userCenter/favorites">我的收藏</el-menu-item>
         <el-menu-item index="/userCenter/orders">我的订单</el-menu-item>
+        <el-menu-item index="/userCenter/messages">消息中心</el-menu-item>
       </el-menu>
     </aside>
     <main class="main">

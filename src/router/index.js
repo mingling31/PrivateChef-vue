@@ -14,6 +14,12 @@ const routes = [
     meta: { requiresAuth: true, roles: ['ROLE_USER'], title: '预约下单' }
   },
   {
+    path: '/payment/:orderId',
+    name: 'Payment',
+    component: () => import('@/views/Payment.vue'),
+    meta: { requiresAuth: true, roles: ['ROLE_USER'], title: '订单支付' }
+  },
+  {
     path: '/ai-dialogue',
     name: 'AiDialogue',
     component: () => import('@/views/AiDialogue.vue'),
@@ -28,7 +34,8 @@ const routes = [
       { path: 'profile', component: () => import('@/views/user/UserProfile.vue'), meta: { title: '个人资料' } },
       { path: 'preferences', component: () => import('@/views/user/UserPreferences.vue'), meta: { title: '我的偏好' } },
       { path: 'favorites', component: () => import('@/views/user/UserFavorites.vue'), meta: { title: '我的收藏' } },
-      { path: 'orders', component: () => import('@/views/user/UserOrders.vue'), meta: { title: '我的订单' } }
+      { path: 'orders', component: () => import('@/views/user/UserOrders.vue'), meta: { title: '我的订单' } },
+      { path: 'messages', component: () => import('@/views/user/UserMessages.vue'), meta: { title: '消息中心' } }
     ]
   },
   {
@@ -74,6 +81,7 @@ function hasRouteAccess(path, roles = []) {
   if (path.startsWith('/chefCenter')) return roles.includes('ROLE_CHEF')
   if (path.startsWith('/userCenter')) return roles.includes('ROLE_USER')
   if (path.startsWith('/order/create')) return roles.includes('ROLE_USER')
+  if (path.startsWith('/payment')) return roles.includes('ROLE_USER')
   if (path.startsWith('/ai-dialogue')) return roles.includes('ROLE_USER')
   if (path.startsWith('/discover')) return !(roles.includes('ROLE_CHEF') || roles.includes('ROLE_ADMIN'))
   return true
