@@ -86,7 +86,7 @@
       <el-table-column label="创建时间" width="170">
         <template #default="{ row }">{{ formatDate(row.createTime) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="90" fixed="right" align="center">
+      <el-table-column label="操作" width="91" fixed="right" align="center">
         <template #default="{ row }">
           <el-button size="small" type="primary" plain @click="openDetail(row)">详情</el-button>
         </template>
