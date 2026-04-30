@@ -3,8 +3,8 @@
     <div class="login-panel">
       <div class="brand">
         <p class="eyebrow">食光私厨</p>
-        <h1>食光私厨上门服务平台</h1>
-        <p>用户与私厨双主体认证，供需匹配更高效。</p>
+        <h1>食光私厨服务平台</h1>
+        <p>寻一味家常，遇一位良厨</p>
       </div>
 
       <el-card class="card" shadow="never">

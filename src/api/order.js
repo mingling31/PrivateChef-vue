@@ -60,6 +60,13 @@ export function completeOrder(orderId) {
   })
 }
 
+export function startService(orderId) {
+  return request({
+    url: `/api/orders/${orderId}/start-service`,
+    method: 'post'
+  })
+}
+
 export function rejectOrder(orderId, rejectReason) {
   return request({
     url: `/api/orders/${orderId}/reject`,

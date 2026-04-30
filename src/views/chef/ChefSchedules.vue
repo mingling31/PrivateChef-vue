@@ -4,16 +4,34 @@
 
     <div class="form-section">
       <div class="section-title">单日设置</div>
-      <el-form :model="form" label-width="88px" class="grid-form">
-        <el-form-item label="日期">
-          <el-date-picker v-model="form.workDate" type="date" value-format="YYYY-MM-DD" />
-        </el-form-item>
-        <el-form-item label="早餐"><el-switch v-model="breakfastOn" /></el-form-item>
-        <el-form-item label="午餐"><el-switch v-model="lunchOn" /></el-form-item>
-        <el-form-item label="晚餐"><el-switch v-model="dinnerOn" /></el-form-item>
-        <el-form-item label="宵夜"><el-switch v-model="snackOn" /></el-form-item>
-      </el-form>
-      <el-button type="primary" @click="saveOne">保存单日设置</el-button>
+      <div class="single-day-row">
+        <el-date-picker
+            v-model="form.workDate"
+            type="date"
+            value-format="YYYY-MM-DD"
+            placeholder="选择日期"
+            style="width: 180px"
+        />
+        <div class="meal-switches">
+          <span class="switch-item">
+            <span class="switch-label">早餐</span>
+            <el-switch v-model="breakfastOn" />
+          </span>
+          <span class="switch-item">
+            <span class="switch-label">午餐</span>
+            <el-switch v-model="lunchOn" />
+          </span>
+          <span class="switch-item">
+            <span class="switch-label">晚餐</span>
+            <el-switch v-model="dinnerOn" />
+          </span>
+          <span class="switch-item">
+            <span class="switch-label">宵夜</span>
+            <el-switch v-model="snackOn" />
+          </span>
+        </div>
+        <el-button type="primary" @click="saveOne">保存</el-button>
+      </div>
     </div>
 
     <el-divider />
@@ -48,19 +66,35 @@
 
     <el-divider />
 
-    <el-table :data="paginatedSchedules" border class="result-table">
-      <el-table-column prop="workDate" label="日期" />
-      <el-table-column label="早餐">
-        <template #default="{ row }">{{ statusText(row.breakfastStatus) }}</template>
+    <el-table :data="paginatedSchedules" border class="result-table" size="small">
+      <el-table-column prop="workDate" label="日期" width="120" />
+      <el-table-column label="早餐" width="80" align="center">
+        <template #default="{ row }">
+          <el-tag :type="tagType(row.breakfastStatus)" size="small">
+            {{ statusText(row.breakfastStatus) }}
+          </el-tag>
+        </template>
       </el-table-column>
-      <el-table-column label="午餐">
-        <template #default="{ row }">{{ statusText(row.lunchStatus) }}</template>
+      <el-table-column label="午餐" width="80" align="center">
+        <template #default="{ row }">
+          <el-tag :type="tagType(row.lunchStatus)" size="small">
+            {{ statusText(row.lunchStatus) }}
+          </el-tag>
+        </template>
       </el-table-column>
-      <el-table-column label="晚餐">
-        <template #default="{ row }">{{ statusText(row.dinnerStatus) }}</template>
+      <el-table-column label="晚餐" width="80" align="center">
+        <template #default="{ row }">
+          <el-tag :type="tagType(row.dinnerStatus)" size="small">
+            {{ statusText(row.dinnerStatus) }}
+          </el-tag>
+        </template>
       </el-table-column>
-      <el-table-column label="宵夜">
-        <template #default="{ row }">{{ statusText(row.snackStatus) }}</template>
+      <el-table-column label="宵夜" width="80" align="center">
+        <template #default="{ row }">
+          <el-tag :type="tagType(row.snackStatus)" size="small">
+            {{ statusText(row.snackStatus) }}
+          </el-tag>
+        </template>
       </el-table-column>
     </el-table>
 
@@ -102,11 +136,9 @@ const batch = reactive({
   snackOn: false
 })
 
-// 分页相关
 const currentPage = ref(1)
 const pageSize = ref(10)
 
-// 计算当前页显示的数据
 const paginatedSchedules = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
@@ -117,13 +149,16 @@ function statusText(status) {
   return { 0: '未开放', 1: '可预约', 2: '已约满' }[status] || '未知'
 }
 
+function tagType(status) {
+  return { 0: 'info', 1: 'success', 2: 'danger' }[status] || 'info'
+}
+
 async function loadData() {
   const chefRes = await getChefByUserId(userInfo.id)
   chefId.value = chefRes.data?.chefId
   if (!chefId.value) return
   const res = await getChefSchedules({ chefId: chefId.value })
   schedules.value = res.data || []
-  // 重置到第一页
   currentPage.value = 1
 }
 
@@ -163,7 +198,6 @@ async function saveBatch() {
   await loadData()
 }
 
-// 分页事件处理
 function handleSizeChange(val) {
   pageSize.value = val
   currentPage.value = 1
@@ -188,7 +222,34 @@ onMounted(loadData)
 .section-title {
   font-weight: 700;
   color: #1b4d7d;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+/* 单日设置行 */
+.single-day-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.meal-switches {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.switch-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.switch-label {
+  font-size: 14px;
+  color: #606266;
+  min-width: 28px;
 }
 
 .grid-form {
@@ -210,5 +271,17 @@ onMounted(loadData)
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .single-day-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .meal-switches {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
 }
 </style>

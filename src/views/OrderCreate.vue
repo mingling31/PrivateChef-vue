@@ -135,7 +135,7 @@
             <el-input v-model="form.dietaryRestrictions" placeholder="例如：不吃香菜、海鲜过敏" />
           </el-form-item>
           <el-form-item label="备注">
-            <el-input v-model="form.specialRequests" type="textarea" :rows="3" />
+            <el-input v-model="form.specialRequests" type="textarea" :rows="1" />
           </el-form-item>
           <el-button type="primary" :loading="submitting" @click="submitOrder">提交订单</el-button>
         </el-form>

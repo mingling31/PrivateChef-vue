@@ -48,12 +48,12 @@
           </el-avatar>
         </template>
       </el-table-column>
-      <el-table-column prop="userId" label="用户ID" width="110" />
-      <el-table-column prop="userName" label="用户名" width="110" />
-      <el-table-column prop="nickname" label="昵称" width="110" />
+      <el-table-column prop="userId" label="用户ID" width="95" />
+      <el-table-column prop="userName" label="用户名" width="85" />
+      <el-table-column prop="nickname" label="昵称" width="95" />
       <el-table-column prop="phone" label="手机号" width="120" />
       <el-table-column prop="email" label="邮箱" min-width="180" show-overflow-tooltip />
-      <el-table-column label="角色" width="100" align="center">
+      <el-table-column label="角色" width="95" align="center">
         <template #default="{ row }">
           <el-tag :type="roleTagType(roleOf(row))">{{ roleText(roleOf(row)) }}</el-tag>
         </template>

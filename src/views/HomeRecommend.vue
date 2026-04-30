@@ -5,8 +5,9 @@
     <div class="shell">
       <section class="hero">
         <div>
-          <p class="eyebrow">智能推荐</p>
-          <h1>食光私厨，帮你更快找到合适私厨</h1>
+          <h3 class="eyebrow">智能推荐</h3>
+          <h1>寻一味家常，遇一位良厨</h1>
+          <h2>食光私厨，帮你找到更合适你的厨师</h2>
         </div>
         <el-card class="ai-entry" shadow="hover" @click="goAi">
           <div class="ai-title">菜品推荐</div>
@@ -385,14 +386,14 @@ onMounted(loadHome)
 .eyebrow {
   color: #1570c9;
   letter-spacing: 0.2em;
-  font-size: 12px;
+  font-size: 19px;
   text-transform: uppercase;
 }
 
 .ai-entry {
   border-radius: 20px;
   border: 2px solid #cde4fb;
-  background: linear-gradient(135deg, #a8b5f5 0%, #b89dd4 100%);
+  background: linear-gradient(135deg, #a8cff5 0%, #b2c8ff 100%);
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;

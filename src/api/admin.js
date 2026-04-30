@@ -15,3 +15,10 @@ export function reviewChef(chefId, data) {
         data
     })
 }
+
+export function getDashboardStats() {
+    return request({
+        url: '/api/admin/stats/dashboard',
+        method: 'get'
+    })
+}

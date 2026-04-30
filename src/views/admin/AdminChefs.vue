@@ -48,10 +48,10 @@
       </el-table-column>
       <el-table-column prop="chefId" label="私厨ID" width="100" />
       <el-table-column prop="realName" label="姓名" width="80" />
-      <el-table-column prop="chefAccount" label="账号" width="130" />
+      <el-table-column prop="chefAccount" label="账号" width="110" />
       <el-table-column prop="phone" label="手机号" width="120" />
       <el-table-column prop="city" label="城市" width="70" />
-      <el-table-column prop="address" label="地址" min-width="160" show-overflow-tooltip />
+      <el-table-column prop="address" label="地址" min-width="120" show-overflow-tooltip />
       <el-table-column label="状态" width="100" align="center">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag>

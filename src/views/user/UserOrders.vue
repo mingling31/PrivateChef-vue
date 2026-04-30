@@ -4,6 +4,7 @@
       <el-card class="stat" shadow="never"><span>全部</span><b>{{ stats.total }}</b></el-card>
       <el-card class="stat" shadow="never"><span>待支付</span><b>{{ stats.unpaid }}</b></el-card>
       <el-card class="stat" shadow="never"><span>待接单</span><b>{{ stats.pending_accept }}</b></el-card>
+      <el-card class="stat" shadow="never"><span>已接单</span><b>{{ stats.accepted }}</b></el-card>
       <el-card class="stat" shadow="never"><span>服务中</span><b>{{ stats.serving }}</b></el-card>
       <el-card class="stat" shadow="never"><span>已完成</span><b>{{ stats.completed }}</b></el-card>
       <el-card class="stat" shadow="never"><span>已取消</span><b>{{ stats.cancelled }}</b></el-card>
@@ -12,7 +13,7 @@
     <el-card class="table-card">
       <div class="toolbar">
         <div class="left-tools">
-          <el-select v-model="tab" style="width: 130px" @change="search">
+          <el-select v-model="tab" style="width: 140px" size="small" @change="search">
             <el-option label="全部状态" value="all" />
             <el-option label="待支付" value="unpaid" />
             <el-option label="待接单" value="pending_accept" />
@@ -27,13 +28,15 @@
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
-              style="width: 250px"
+              size="small"
+              style="width: 160px"
               @change="search"
           />
           <el-input
               v-model="keyword"
               clearable
-              style="width: 240px"
+              size="small"
+              style="width: 180px"
               placeholder="订单号/私厨姓名"
               @clear="search"
               @keyup.enter="search"
@@ -42,39 +45,42 @@
               <el-icon><Search /></el-icon>
             </template>
           </el-input>
-          <el-button type="primary" @click="search">搜索</el-button>
-          <el-button @click="resetSearch">重置</el-button>
+          <el-button type="primary" size="small" @click="search">搜索</el-button>
+          <el-button size="small" @click="resetSearch">重置</el-button>
         </div>
       </div>
 
-      <el-table :data="orders" border stripe v-loading="loading">
-        <el-table-column prop="orderNo" label="订单号" min-width="180" />
+      <el-table :data="orders" border stripe v-loading="loading" size="small" class="order-table">
+        <el-table-column prop="orderNo" label="订单号" min-width="100" show-overflow-tooltip />
         <el-table-column label="服务时间" width="120">
           <template #default="{ row }">
-            <div>{{ row.serviceDate }}</div>
-            <div class="sub">{{ mealLabel(row.mealType) }} {{ row.serviceTime || '' }}</div>
+            <div class="cell-text">{{ row.serviceDate }}</div>
+            <div class="cell-sub">{{ mealLabel(row.mealType) }} {{ row.serviceTime || '' }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="私厨信息" min-width="150">
+        <el-table-column label="私厨信息" min-width="70">
           <template #default="{ row }">
             <div class="person-cell">
-              <el-avatar :size="34" :src="img(row.chef?.avatar, '/images/chef/default-chef.png')" />
+              <el-avatar :size="28" :src="img(row.chef?.avatar, '/images/chef/default-chef.png')" />
               <div>
-                <div>{{ row.chef?.realName || row.chef?.chefAccount || row.chefId }}</div>
-                <small>{{ row.chef?.phone || '-' }}</small>
+                <div class="cell-text">{{ row.chef?.realName || row.chef?.chefAccount || row.chefId }}</div>
               </div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="套餐" min-width="120" show-overflow-tooltip>
-          <template #default="{ row }">{{ row.packageInfo?.packageName || row.packageId }}</template>
+        <el-table-column label="套餐" min-width="80" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span class="cell-text">{{ row.packageInfo?.packageName || row.packageId }}</span>
+          </template>
         </el-table-column>
         <el-table-column label="金额" width="70" align="right">
-          <template #default="{ row }"><span class="amount">¥{{ row.totalAmount }}</span></template>
-        </el-table-column>
-        <el-table-column label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag>
+            <span class="amount">¥{{ row.totalAmount }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="85" align="center">
+          <template #default="{ row }">
+            <el-tag :type="statusTagType(row.status)" size="small">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="280" fixed="right">
@@ -104,13 +110,14 @@
             :total="total"
             :page-sizes="[10, 20, 50]"
             layout="total, sizes, prev, pager, next, jumper"
+            size="small"
             @current-change="reload"
             @size-change="reload"
         />
       </div>
     </el-card>
 
-    <!-- 优化后的订单详情弹窗 - 宽度减小到700px，间距压缩 -->
+    <!-- 订单详情弹窗 -->
     <el-dialog v-model="detailVisible" title="订单详情" width="700px" class="order-detail-dialog">
       <div v-if="currentOrder.orderId" class="detail-wrap">
         <div class="detail-head">
@@ -178,7 +185,7 @@
       </template>
     </el-dialog>
 
-    <!-- 评价弹窗保持不变 -->
+    <!-- 评价弹窗 -->
     <el-dialog v-model="reviewVisible" title="订单评价" width="500px">
       <el-form :model="reviewForm" label-width="90px">
         <el-form-item label="综合评分">
@@ -239,6 +246,7 @@ function statusText(status) {
   const map = {
     unpaid: '待支付',
     pending_accept: '待接单',
+    accepted: '私厨已接单',
     serving: '服务中',
     completed: '已完成',
     cancelled: '已取消'
@@ -250,6 +258,7 @@ function statusTagType(status) {
   const map = {
     unpaid: 'warning',
     pending_accept: 'info',
+    accepted: 'warning',
     serving: 'primary',
     completed: 'success',
     cancelled: 'danger'
@@ -381,7 +390,7 @@ onMounted(reload)
 }
 
 .stat :deep(.el-card__body) {
-  padding: 12px 14px;
+  padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -389,11 +398,12 @@ onMounted(reload)
 
 .stat span {
   color: #64748b;
+  font-size: 13px;
 }
 
 .stat b {
   color: #111827;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .table-card {
@@ -401,44 +411,72 @@ onMounted(reload)
 }
 
 .toolbar {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .left-tools {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
-.sub {
-  color: #94a3b8;
+/* 表格样式 */
+.order-table {
+  font-size: 13px;
+}
+
+.order-table :deep(.el-table__header th) {
+  padding: 8px 0;
   font-size: 12px;
-  margin-top: 2px;
+}
+
+.order-table :deep(.el-table__body td) {
+  padding: 6px 0;
+}
+
+.cell-text {
+  font-size: 13px;
+}
+
+.cell-sub {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-top: 1px;
 }
 
 .person-cell {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.person-cell small {
-  color: #94a3b8;
+  gap: 6px;
 }
 
 .amount {
   color: #ef4444;
   font-weight: 600;
+  font-size: 13px;
+}
+
+/* 操作按钮 */
+.action-btns {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.action-btns .el-button {
+  font-size: 12px;
+  padding: 0 4px;
+  height: 24px;
 }
 
 .pagination {
-  margin-top: 16px;
+  margin-top: 12px;
   display: flex;
   justify-content: flex-end;
 }
 
-/* 订单详情弹窗样式 - 宽度700px，间距紧凑 */
+/* 订单详情弹窗样式 */
 .order-detail-dialog :deep(.el-dialog__body) {
   padding: 16px 20px;
 }
@@ -564,16 +602,6 @@ onMounted(reload)
 .dish-item small {
   color: #94a3b8;
   font-size: 12px;
-}
-
-/* 取消原因样式 */
-.cancel-reason {
-  color: #f56c6c;
-  font-size: 13px;
-}
-
-.no-reason {
-  color: #c0c4cc;
 }
 
 /* 评价弹窗评分数字样式 */

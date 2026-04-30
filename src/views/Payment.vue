@@ -17,7 +17,7 @@
           <el-descriptions-item label="服务日期">{{ order.serviceDate }}</el-descriptions-item>
           <el-descriptions-item label="用餐时段">{{ mealText(order.mealType) }}</el-descriptions-item>
           <el-descriptions-item label="服务时间">{{ order.serviceTime }}</el-descriptions-item>
-          <el-descriptions-item label="套餐名称">{{ order.packageName || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="套餐名称">{{ order.packageInfo?.packageName || '-' }}</el-descriptions-item>
           <el-descriptions-item label="用餐人数">{{ order.persons }}人</el-descriptions-item>
           <el-descriptions-item label="食材方式">{{ order.ingredientOption === 2 ? '私厨代买' : '自备食材' }}</el-descriptions-item>
           <el-descriptions-item label="套餐价格">¥{{ order.packagePrice }}</el-descriptions-item>
@@ -26,6 +26,16 @@
             <span class="total-price">¥{{ order.totalAmount }}</span>
           </el-descriptions-item>
         </el-descriptions>
+
+        <div class="address-section">
+          <h3 class="section-title">服务地址</h3>
+          <el-descriptions v-if="order.address" :column="1" border>
+            <el-descriptions-item label="联系人">{{ order.address.contactName }}</el-descriptions-item>
+            <el-descriptions-item label="联系电话">{{ order.address.contactPhone }}</el-descriptions-item>
+            <el-descriptions-item label="服务地址">{{ order.address.province }}{{ order.address.city }}{{ order.address.district }}{{ order.address.detailAddress }}</el-descriptions-item>
+          </el-descriptions>
+          <el-empty v-else description="暂无地址信息" :image-size="60" />
+        </div>
 
         <div v-if="order.status !== 'unpaid'" class="status-alert">
           <el-alert :title="statusText(order.status)" :type="statusType(order.status)" :closable="false" show-icon />
@@ -120,5 +130,7 @@ onMounted(loadOrder)
 .total-row { font-weight: 700; }
 .total-price { font-size: 20px; color: #e65a5a; }
 .status-alert { margin-top: 20px; }
+.address-section { margin-top: 20px; }
+.section-title { font-size: 16px; font-weight: 600; margin: 0 0 12px; }
 .actions { display: flex; justify-content: center; gap: 16px; margin-top: 24px; }
 </style>

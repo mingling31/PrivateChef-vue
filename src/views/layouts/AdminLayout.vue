@@ -3,6 +3,10 @@
     <aside class="sidebar">
       <div class="logo">Admin</div>
       <el-menu router :default-active="$route.path">
+        <el-menu-item index="/admin/dashboard">
+          <el-icon><DataAnalysis /></el-icon>
+          <span>数据看板</span>
+        </el-menu-item>
         <el-menu-item index="/admin/users">用户管理</el-menu-item>
         <el-menu-item index="/admin/chefs">私厨审核</el-menu-item>
         <el-menu-item index="/admin/orders">订单管理</el-menu-item>
@@ -24,6 +28,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { DataAnalysis } from '@element-plus/icons-vue'
 import { logout } from '@/utils/auth'
 
 const router = useRouter()

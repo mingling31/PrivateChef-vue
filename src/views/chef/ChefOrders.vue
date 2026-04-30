@@ -80,12 +80,18 @@
         <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
             <el-button size="small" type="primary" plain @click="openDetail(row)">详情</el-button>
+            <!-- 待接单状态：接单/拒绝 -->
             <el-button v-if="row.status === 'pending_accept'" size="small" type="success" @click="accept(row)">
               接单
             </el-button>
             <el-button v-if="row.status === 'pending_accept'" size="small" type="danger" plain @click="openRejectDialog(row)">
               拒绝
             </el-button>
+            <!-- 已接单状态：开始服务 -->
+            <el-button v-if="row.status === 'accepted'" size="small" type="warning" @click="startService(row)">
+              开始服务
+            </el-button>
+            <!-- 服务中状态：完成 -->
             <el-button v-if="row.status === 'serving'" size="small" type="warning" @click="complete(row)">
               完成
             </el-button>
@@ -202,7 +208,7 @@ import { computed, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { getChefByUserId } from '@/api/chef'
-import { acceptOrder, completeOrder, getOrderDetail, getOrders, rejectOrder } from '@/api/order'
+import { acceptOrder, completeOrder, getOrderDetail, getOrders, rejectOrder, startService as startServiceApi } from '@/api/order'
 
 const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
 
@@ -227,7 +233,7 @@ const rejectReason = ref('')
 const rejecting = ref(false)
 
 const stats = computed(() => {
-  const s = { total: total.value, unpaid: 0, pending_accept: 0, serving: 0, completed: 0, cancelled: 0 }
+  const s = { total: total.value, unpaid: 0, pending_accept: 0, accepted: 0, serving: 0, completed: 0, cancelled: 0 }
   orders.value.forEach((o) => {
     if (s[o.status] !== undefined) s[o.status] += 1
   })
@@ -238,6 +244,7 @@ function statusText(status) {
   const map = {
     unpaid: '待支付',
     pending_accept: '待接单',
+    accepted: '已接单',
     serving: '服务中',
     completed: '已完成',
     cancelled: '已取消'
@@ -249,6 +256,7 @@ function statusTagType(status) {
   const map = {
     unpaid: 'warning',
     pending_accept: 'info',
+    accepted: 'warning',
     serving: 'primary',
     completed: 'success',
     cancelled: 'danger'
@@ -339,10 +347,20 @@ async function openDetail(row) {
 async function accept(row) {
   try {
     await acceptOrder(row.orderId)
-    ElMessage.success('接单成功')
+    ElMessage.success('接单成功，请按时上门服务')
     await reload()
   } catch (e) {
-    ElMessage.error('接单失败')
+    ElMessage.error(e?.response?.data?.message || '接单失败')
+  }
+}
+
+async function startService(row) {
+  try {
+    await startServiceApi(row.orderId)
+    ElMessage.success('服务已开始')
+    await reload()
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || '操作失败')
   }
 }
 

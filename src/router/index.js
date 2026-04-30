@@ -56,7 +56,8 @@ const routes = [
     component: () => import('@/views/layouts/AdminLayout.vue'),
     meta: { requiresAuth: true, roles: ['ROLE_ADMIN'] },
     children: [
-      { path: '', redirect: '/admin/users' },
+      { path: '', redirect: '/admin/dashboard' },
+      { path: 'dashboard', component: () => import('@/views/admin/AdminDashboard.vue'), meta: { title: '数据看板' } },
       { path: 'users', component: () => import('@/views/admin/AdminUsers.vue'), meta: { title: '用户管理' } },
       { path: 'chefs', component: () => import('@/views/admin/AdminChefs.vue'), meta: { title: '私厨审核' } },
       { path: 'orders', component: () => import('@/views/admin/AdminOrders.vue'), meta: { title: '订单管理' } }
@@ -71,7 +72,7 @@ const router = createRouter({
 })
 
 function getRoleHome(roles = []) {
-  if (roles.includes('ROLE_ADMIN')) return '/admin/users'
+  if (roles.includes('ROLE_ADMIN')) return '/admin/dashboard'
   if (roles.includes('ROLE_CHEF')) return '/chefCenter/profile'
   return '/discover'
 }

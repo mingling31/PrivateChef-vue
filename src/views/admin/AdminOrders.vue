@@ -7,6 +7,8 @@
           <el-tag type="primary">总订单 {{ total }}</el-tag>
           <el-tag type="warning">待支付 {{ stats.unpaid }}</el-tag>
           <el-tag type="info">待接单 {{ stats.pending_accept }}</el-tag>
+          <el-tag type="warning">已接单 {{ stats.accepted }}</el-tag>
+          <el-tag type="success">服务中 {{ stats.serving }}</el-tag>
           <el-tag type="success">已完成 {{ stats.completed }}</el-tag>
         </div>
       </div>
@@ -52,12 +54,12 @@
 
     <el-table :data="orders" border stripe v-loading="loading">
       <el-table-column prop="orderNo" label="订单号" width="180" />
-      <el-table-column label="用户" width="100" show-overflow-tooltip>
+      <el-table-column label="用户" width="80" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.user?.nickname || row.user?.userName || row.userId }}
         </template>
       </el-table-column>
-      <el-table-column label="私厨" width="100" show-overflow-tooltip>
+      <el-table-column label="私厨" width="80" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.chef?.realName || row.chef?.chefAccount || row.chefId }}
         </template>
@@ -221,6 +223,7 @@ function statusTagType(status) {
   const map = {
     unpaid: 'warning',
     pending_accept: 'info',
+    accepted: 'warning',
     serving: 'primary',
     completed: 'success',
     cancelled: 'danger'
@@ -477,4 +480,8 @@ onMounted(reload)
     grid-template-columns: 1fr;
   }
 }
+</style>
+</style>
+}
+</style>
 </style>
